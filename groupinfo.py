@@ -5,9 +5,13 @@ class GroupInfo:
 
     def __init__(self, chat_id, existing_data=None):
         self.chat_id = chat_id
+        print(existing_data)
         # If we have a chain saved, then make the model from it
         if existing_data is not None:
             self.model = markovify.Text.from_chain(ast.literal_eval(existing_data))
+
+    def sentence(self):
+        return self.model.make_sentence()
 
     def add_message(self, message):
         new_model = markovify.Text(message)
@@ -17,7 +21,6 @@ class GroupInfo:
             self.model = markovify.combine([self.model, new_model])
         except AttributeError:
             self.model = new_model
-
 
     def get_data(self):
         return self.model.chain.to_json()

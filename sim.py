@@ -1,8 +1,9 @@
-from telegram.ext import Updater, StringCommandHandler, StringRegexHandler, MessageHandler, CommandHandler, RegexHandler, Filters
+from telegram.ext import Updater, MessageHandler, CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 import telegram
 import yaml
 import json
+import ast
 import os.path
 import logging
 from groupinfo import GroupInfo
@@ -20,13 +21,24 @@ providers of this bot take no responsibility for any consequences that may arise
 
 groups = {}
 
-
+# Standard commands
 def start(bot, update):
     bot.send_message(update.message.chat_id, text=START_TEXT)
 
 def privacy(bot, update):
     bot.send_message(update.message.chat_id, text=PRIVACY_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
 
+
+# Case specific command
+def generate(bot, update):
+    chat_id = update.message.chat_id
+    try:
+        sentence = groups[chat_id].sentence()
+        bot.send_message(chat_id, text=sentence)
+    except KeyError:
+        bot.send_message(chat_id, text="We don't have any chat information from this group yet!")
+
+# General message handler
 def message(bot, update):
     chat_id = update.message.chat_id
     message = update.message.text
@@ -52,7 +64,7 @@ def main():
             with open(DATA_FILENAME, 'r') as saved:
                 data = json.loads(saved.read())
                 for chat_id in data:
-                    groups[chat_id] = GroupInfo(chat_id, data[chat_id])
+                    groups[ast.literal_eval(chat_id)] = GroupInfo(chat_id, data[chat_id])
         except ValueError:
             logging.info("No JSON saved data found")
 
@@ -61,6 +73,7 @@ def main():
     dispatcher.add_handler(MessageHandler([Filters.text], message))
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("privacy", privacy))
+    dispatcher.add_handler(CommandHandler("generate", generate))
 
     updater.start_polling(timeout=10)
 
