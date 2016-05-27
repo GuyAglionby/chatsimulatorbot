@@ -10,7 +10,8 @@ from groupinfo import GroupInfo
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 DATA_FILENAME = 'data.dat'
-START_TEXT = ''
+START_TEXT = 'This bot constructs sentences based off your group\'s previous messages. Invite it to your group and try it out with /generate. You may have to wait for enough messages to be gathered \
+to get good messages'
 # In the interest of full disclosure
 PRIVACY_TEXT = '*Privacy Information*\n\nIn order for this bot to work, we require access to all messages sent in your groups. As a result we provide this privacy information to let you know what we do with your data.\n\n\
 Messages sent in your group(s) are processed by the bot to build a unique Markov chain, which is used to automatically generate sentences. \
@@ -23,7 +24,7 @@ groups = {}
 
 # Standard commands
 def start(bot, update):
-    bot.send_message(update.message.chat_id, text=START_TEXT)
+    bot.send_message(update.message.chat_id, text=START_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
 
 def privacy(bot, update):
     bot.send_message(update.message.chat_id, text=PRIVACY_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
@@ -43,12 +44,13 @@ def message(bot, update):
     chat_id = update.message.chat_id
     message = update.message.text
 
-    global groups
-    if chat_id not in groups:
-        groups[chat_id] = GroupInfo(chat_id)
+    # Ignore single word replies
+    if ' ' in message:
+        global groups
+        if chat_id not in groups:
+            groups[chat_id] = GroupInfo(chat_id)
 
-    groups[chat_id].add_message(message)
-    pass
+        groups[chat_id].add_message(message)
 
 def main():
     # Load telegram API stuff
@@ -99,6 +101,9 @@ def main():
 
             updater.stop()
             break
+
+        else:
+            logging.info("Unknown command")
 
 if __name__ == '__main__':
     main()

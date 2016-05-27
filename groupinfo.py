@@ -5,7 +5,6 @@ class GroupInfo:
 
     def __init__(self, chat_id, existing_data=None):
         self.chat_id = chat_id
-        print(existing_data)
         # If we have a chain saved, then make the model from it
         if existing_data is not None:
             self.model = markovify.Text.from_chain(ast.literal_eval(existing_data))
