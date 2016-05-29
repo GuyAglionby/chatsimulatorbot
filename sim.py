@@ -11,7 +11,11 @@ from groupinfo import GroupInfo
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 DATA_FILENAME = 'data.dat'
 START_TEXT = 'This bot constructs sentences based off your group\'s previous messages. Invite it to your group and try it out with /generate. You may have to wait for enough messages to be gathered \
-to get good messages'
+to get good results.'
+HELP_TEXT = '*ChatSimulatorBot Help*\n\n\
+/generate - Generate a sentence using your group\'s Markov chain\
+/clearhistory - Remove all information that we hold about your group\
+/privacy - View our privacy information'
 # In the interest of full disclosure
 PRIVACY_TEXT = '*Privacy Information*\n\nIn order for this bot to work, we require access to all messages sent in your groups. As a result we provide this privacy information to let you know what we do with your data.\n\n\
 Messages sent in your group(s) are processed by the bot to build a unique Markov chain, which is used to automatically generate sentences. \
@@ -29,6 +33,8 @@ def start(bot, update):
 def privacy(bot, update):
     bot.send_message(update.message.chat_id, text=PRIVACY_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
 
+def help(bot, update):
+    bot.send_message(update.message.chat_id, text=HELP_TEXT, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # Case specific command
 def generate(bot, update):
@@ -40,6 +46,14 @@ def generate(bot, update):
         bot.send_message(chat_id, text=sentence)
     except KeyError:
         bot.send_message(chat_id, text="_I don't have any chat information from this group yet!_", parse_mode=telegram.ParseMode.MARKDOWN)
+
+def clear_history(bot, update):
+    chat_id = update.message.chat_id
+    try:
+        groups.pop(chat_id)
+        bot.send_message(chat_id, text="_Removed all information for this group._", parse_mode=telegram.ParseMode.MARKDOWN)
+    except KeyError:
+        bot.send_message(chat_id, text="_I don't have any information for this group!_", parse_mode=telegram.ParseMode.MARKDOWN)
 
 # General message handler
 def message(bot, update):
@@ -78,6 +92,7 @@ def main():
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("privacy", privacy))
     dispatcher.add_handler(CommandHandler("generate", generate))
+    dispatcher.add_handler(CommandHandler("clearhistory", clear_history))
 
     updater.start_polling(timeout=10)
 
