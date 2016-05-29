@@ -43,7 +43,9 @@ def generate(bot, update):
         sentence = groups[chat_id].sentence()
         if sentence == 'null':
             bot.send_message(chat_id, text="_I haven't got enough information to generate a sentence for you yet!_", parse_mode=telegram.ParseMode.MARKDOWN)
-        bot.send_message(chat_id, text=sentence)
+        else:
+            sentence = sentence.decode('unicode-escape')
+            bot.send_message(chat_id, text=sentence)
     except KeyError:
         bot.send_message(chat_id, text="_I don't have any chat information from this group yet!_", parse_mode=telegram.ParseMode.MARKDOWN)
 
