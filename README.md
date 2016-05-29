@@ -6,3 +6,7 @@ Utilises [Markovify](https://github.com/jsvine/markovify) for Markov chains, and
 
 ## Usage
 You can run your own version of this bot by following the instructions [here](https://core.telegram.org/bots#botfather) to get an API key, which should be put in the config.yml file. This bot is available for your usage at [here](http://www.telegram.me/ChatSimulatorBot).
+
+## Todo
+- Unicode support - accented characters do not work.
+- Use [NLTK](http://www.nltk.org/) to produce more sensible sentences (possibly optionally)
