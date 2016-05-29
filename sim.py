@@ -66,6 +66,8 @@ def message(bot, update):
         if chat_id not in groups:
             groups[chat_id] = GroupInfo(chat_id)
 
+        # quote and speech marks break Markovify
+        message = message.replace("\"", "").replace("\'", "")
         groups[chat_id].add_message(message)
 
 def main():
