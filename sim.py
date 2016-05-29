@@ -104,6 +104,9 @@ def main():
             updater.stop()
             break
 
+        elif text == 'numchans':
+            logging.info("The bot has data for %d channels" % len(groups))
+
         else:
             logging.info("Unknown command")
 
